@@ -1,6 +1,6 @@
 name: Rollback Preprod branch
 
-on:
+on: 
 
   push:
 
