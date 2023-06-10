@@ -8,8 +8,6 @@ on:
 
       - 'release-**.**.**'
 
- 
-
 jobs:
 
   rollback-preprod-branch:
@@ -17,8 +15,6 @@ jobs:
     name: Rollback to Previous versions
 
     runs-on: [self-hosted, cip]
-
- 
 
     steps:
 
@@ -43,7 +39,6 @@ jobs:
             secret/data/devops/github-runners/cicd-cip/config PAT | PAT
 
  
-
       - name: Check out code
 
         uses: actions/checkout@v3
@@ -55,7 +50,6 @@ jobs:
           token: ${{ steps.vault-secrets.outputs.PAT }}
 
  
-
       - name: Install github cli
 
         run: |
@@ -67,8 +61,6 @@ jobs:
           sudo apt update
 
           sudo apt install gh
-
- 
 
       - name: rollback to certain version
 
@@ -85,9 +77,6 @@ jobs:
           GITHUB_TOKEN: ${{ steps.vault-secrets.outputs.PAT }}
 
        
-
- 
-
       - name: Check out Infra Repo
 
         uses: actions/checkout@v3
@@ -97,9 +86,6 @@ jobs:
           repository: 'XSIGHTME/dataverse-infra'
 
           token: ${{ steps.vault-secrets.outputs.PAT }}
-
-
-
 
 
       - name: Change targetRevision
