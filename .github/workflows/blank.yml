@@ -14,7 +14,7 @@ jobs:
 
     name: Rollback to Previous versions
 
-    runs-on: [self-hosted, cip]
+    runs-on: [ubuntu-latest]
 
     steps:
 
