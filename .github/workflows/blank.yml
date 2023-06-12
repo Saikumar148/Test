@@ -17,7 +17,7 @@ jobs:
           url: https://vault.cicd-cip.xsight.me
           method: kubernetes
           path: kubernetes-cicd-cip/
-          role: github-runners-cicd-cip
+          role: ubuntu-latest
           secrets: |
             secret/data/devops/github-runners/cicd-cip/config PAT | PAT
 
