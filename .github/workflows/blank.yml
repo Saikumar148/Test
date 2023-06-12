@@ -6,7 +6,7 @@ on:
 
     branches:
 
-      - 'release-**.**.**'
+      - 'main'
 
 jobs:
 
@@ -18,38 +18,6 @@ jobs:
 
     steps:
 
-      - name: Import Secrets
-
-        id: vault-secrets
-
-        uses: hashicorp/vault-action@v2
-
-        with:
-
-          url: https://vault.cicd-cip.xsight.me
-
-          method: kubernetes
-
-          path: kubernetes-cicd-cip/
-
-          role: github-runners-cicd-cip
-
-          secrets: |
-
-            secret/data/devops/github-runners/cicd-cip/config PAT | PAT
-
- 
-      - name: Check out code
-
-        uses: actions/checkout@v3
-
-        with:
-
-          ref: ${{ github.ref }}
-
-          token: ${{ steps.vault-secrets.outputs.PAT }}
-
- 
       - name: Install github cli
 
         run: |
@@ -99,9 +67,6 @@ jobs:
             cd charts/argocd
 
             yq e '(.server.additionalApplications[]|select(.name == "${{ github.event.repository.name }}").source.targetRevision) |= "${{ steps.branchname.outputs.result }}"' -i values-uat.yaml
-
-
-
 
 
       - name: Commit branch change to values file
