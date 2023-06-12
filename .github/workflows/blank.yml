@@ -10,11 +10,6 @@ jobs:
     runs-on: [ubuntu-latest]
 
     steps:
-      - name: Check out code
-        uses: actions/checkout@v3
-        with:
-          ref: ${{ github.ref }}
-          token: ${{ steps.vault-secrets.outputs.PAT }}
 
       - name: Install github cli
         run: |
