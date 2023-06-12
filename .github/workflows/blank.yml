@@ -1,78 +1,64 @@
 name: Rollback Preprod branch
-
-on: 
-
+on:
   push:
-
     branches:
-
       - 'main'
 
 jobs:
-
   rollback-preprod-branch:
-
     name: Rollback to Previous versions
-
     runs-on: [ubuntu-latest]
 
     steps:
+      - name: Import Secrets
+        id: vault-secrets
+        uses: hashicorp/vault-action@v2
+        with:
+          url: https://vault.cicd-cip.xsight.me
+          method: kubernetes
+          path: kubernetes-cicd-cip/
+          role: github-runners-cicd-cip
+          secrets: |
+            secret/data/devops/github-runners/cicd-cip/config PAT | PAT
+
+      - name: Check out code
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.ref }}
+          token: ${{ steps.vault-secrets.outputs.PAT }}
 
       - name: Install github cli
-
         run: |
-
           curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
-
           echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
-
           sudo apt update
-
           sudo apt install gh
 
       - name: rollback to certain version
-
         uses: fivebluepetals/rollback-action@v1.0
-
         id:   branchname
-
         with:
-
           branch: ${{ github.event.inputs.branch }}
-
           targetRevision: ${{ github.event.inputs.revision }}
-
           GITHUB_TOKEN: ${{ steps.vault-secrets.outputs.PAT }}
 
-       
+
       - name: Check out Infra Repo
-
         uses: actions/checkout@v3
-
         with:
-
           repository: 'XSIGHTME/dataverse-infra'
-
           token: ${{ steps.vault-secrets.outputs.PAT }}
 
 
       - name: Change targetRevision
-
         uses: tomasdedic/yq-action@1.4
-
         with:
-
           command: |
-
             cd charts/argocd
-
             yq e '(.server.additionalApplications[]|select(.name == "${{ github.event.repository.name }}").source.targetRevision) |= "${{ steps.branchname.outputs.result }}"' -i values-uat.yaml
 
 
       - name: Commit branch change to values file
-
         uses: EndBug/add-and-commit@v9
-
         with:
-
-          message: 'Rollback branch for ${{ github.event.repository.name }} by github actions' 
+          message: 'Rollback branch for ${{ github.event.repository.name }} by github actions'
